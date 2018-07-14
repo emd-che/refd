@@ -1,0 +1,7 @@
+[package]
+name = "file_search"
+version = "0.1.0"
+authors = ["baddin <baddin2016@gmail.com>"]
+
+[dependencies]
+regex = "1.0.1"
