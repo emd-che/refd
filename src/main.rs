@@ -4,25 +4,25 @@
 //#4 performing a regular exp in the file. #done
 extern crate regex;
 
-
-
 use std::fs::File;
-
 use std::io::prelude::*;
 use std::env;
-
 use regex::Regex;
+
 fn main(){
-    let args =  &env::args()
+    let args =  env::args()
                         .into_iter()                 
                         .skip(1)
                         .collect::<Vec<String>>();
 
     let pattren = &args[0];
-    let filenames = &args[1..];
+    let filenames =  &args[1..];
          
     for filename in filenames{
-        println!("{:?}", search(filename.to_string(), pattren));
+        match search(filename, pattren) {
+            Ok(file_name) => println!("{}", file_name),
+            Err(_) => {}
+        }
     }                   
     
 
@@ -56,26 +56,37 @@ fn main(){
     */      
 }
 
-fn search(filename: String, pattren: &str) -> Result<String, &str> {
-    if is_found(&read_file(&filename), pattren) {
-        Ok(filename)
-    } else {
-        Err("Not found!")
+fn search(filename: &str, pattren: &str) -> Result<String, String> {
+    let text = match read_file(filename){
+        Ok(t) => t,
+        Err(v) => return Err(v.to_string())
+    };
+    match is_found(&text, pattren) {
+        Ok(_) => Ok(filename.to_string()),
+        Err(_) => Err("Not found!".to_string()) 
     }
 
 }
 
-fn is_found(text: &str, pattren: &str) -> bool {
+fn is_found(text: &str, pattren: &str) -> Result<bool, bool> {
     let re = Regex::new(pattren).unwrap();
-    re.is_match(text)
+    if re.is_match(text)  {
+        Ok(true)
+    } else {
+        Err(false)
+    }
 }
 
 
-fn read_file(path: &str) -> String{
-    let mut file = File::open(path).unwrap();
+fn read_file(path: &str) -> Result<String, &str>{
+    let mut file = match File::open(path) {
+        Ok(f) => f, 
+        Err(_) => return Err("Error reading file")
+    };
+
     let mut content = String::new();
     let _c = file.read_to_string(&mut content);
-    return content;
+    Ok(content)
 }
 
 /*
