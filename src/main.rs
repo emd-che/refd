@@ -14,48 +14,27 @@ fn main(){
                         .into_iter()                 
                         .skip(1)
                         .collect::<Vec<String>>();
-
-    let pattren = &args[0];
-    let filenames =  &args[1..];
-         
-    for filename in filenames{
-        match search(filename, pattren) {
-            Ok(file_name) => println!("{}", file_name),
-            Err(_) => {}
-        }
-    }                   
+    if args.len() >= 2 {
+        let pattren = &args[0];
+        let filenames =  &args[1..];
+             
+        for filename in filenames{
+            match search(filename, pattren) {
+                Ok(file_name) => println!("{}", file_name),
+                Err(_) => {}
+            }
+        }             
+    } else {
+        println!("Usage: refd pattren files...");
+    } 
+          
     
-
-
-                        /*
-    let paths = fs::read_dir("../").unwrap();
-    let text_files: Vec<_> = paths.collect();
-    */
-
-    //multi files
-    /*
-    for path in &text_files {
-        match path{
-            Ok(a) => {
-                let f = a.path();
-                let p = Path::new(&f);
-                match p.extension() {
-                    Some(ext) => {
-                        if ext == "rs"  {
-                            if is_found(&read_file(&f), pattren) {
-                                println!("{:?}", p.file_name().unwrap());
-                            }
-                        }
-                    },
-                    _ => {}
-                }
-            },
-            Err(_) => println!("Error!"),
-        };
-    }  
-    */      
 }
 
+
+
+/// This function takes a file name and pattren and returns the name
+/// of the file which contains the text that match the pattren 
 fn search(filename: &str, pattren: &str) -> Result<String, String> {
     let text = match read_file(filename){
         Ok(t) => t,
@@ -68,6 +47,10 @@ fn search(filename: &str, pattren: &str) -> Result<String, String> {
 
 }
 
+
+
+/// This function takes a text and a pattren and uses regular expression to
+/// test if they match
 fn is_found(text: &str, pattren: &str) -> Result<bool, bool> {
     let re = Regex::new(pattren).unwrap();
     if re.is_match(text)  {
@@ -78,6 +61,7 @@ fn is_found(text: &str, pattren: &str) -> Result<bool, bool> {
 }
 
 
+/// This function reads a file and return it's content
 fn read_file(path: &str) -> Result<String, &str>{
     let mut file = match File::open(path) {
         Ok(f) => f, 
@@ -89,24 +73,13 @@ fn read_file(path: &str) -> Result<String, &str>{
     Ok(content)
 }
 
-/*
-fn read_file(path: &PathBuf) -> String{
-    let mut file = File::open(path).unwrap();
-    let mut content = String::new();
-    let _c = file.read_to_string(&mut content);
-    return content;
+#[test]
+fn test_is_found() {
+    assert_eq!(is_found("hi there", "hi"), Ok(true));
+    assert_eq!(is_found("hi there", "hello"), Err(false));
 }
-*/
 
 
-
-
-
-fn _print_result(data: String) {
-    println!("{}", data);
-    println!("--------------------------");
-    println!("--------------------------");
-}
 
 
 
