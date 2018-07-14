@@ -1,7 +1,4 @@
-//#1 listing the files in a vec       #done!
-//#2 getting every file obeject       #done!
-//#3 and opening each one             #done!
-//#4 performing a regular exp in the file. #done
+
 extern crate regex;
 
 use std::fs::File;
