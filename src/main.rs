@@ -74,6 +74,7 @@ fn read_file(path: &str) -> Result<String, &str>{
 fn test_is_found() {
     assert_eq!(is_found("hi there", "hi"), Ok(true));
     assert_eq!(is_found("hi there", "hello"), Err(false));
+    assert_eq!(is_found("Hi there", "[Hh]i"), Ok(true));
 }
 
 
