@@ -4,10 +4,10 @@
 //#4 performing a regular exp in the file. #done
 extern crate regex;
 
-use std::io;
-use std::path::Path;
+
+
 use std::fs::File;
-use std::path::PathBuf;
+
 use std::io::prelude::*;
 use std::env;
 
@@ -16,12 +16,17 @@ fn main(){
     let args =  &env::args()
                         .into_iter()                 
                         .skip(1)
-                        .take(2)
                         .collect::<Vec<String>>();
 
-    let filename = &args[0];
-    let pattren = &args[1];                    
-    println!("{:?}", search(filename.to_string(), pattren));
+    let pattren = &args[0];
+    let filenames = &args[1..];
+         
+    for filename in filenames{
+        println!("{:?}", search(filename.to_string(), pattren));
+    }                   
+    
+
+
                         /*
     let paths = fs::read_dir("../").unwrap();
     let text_files: Vec<_> = paths.collect();
@@ -55,7 +60,7 @@ fn search(filename: String, pattren: &str) -> Result<String, &str> {
     if is_found(&read_file(&filename), pattren) {
         Ok(filename)
     } else {
-        Err("Error reading file")
+        Err("Not found!")
     }
 
 }
