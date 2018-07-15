@@ -17,7 +17,11 @@ fn main(){
              
         for filename in filenames{
             match search(filename, pattren) {
-                Ok(file_name) => println!("{}", file_name),
+                Ok(result) => {
+                    for r in result {
+                        println!("{}\n", r);
+                    }
+                },
                 Err(_) => {}
             }
         }             
@@ -29,21 +33,27 @@ fn main(){
 }
 
 
-
 /// This function takes a file name and pattren and returns the name
 /// of the file which contains the text that match the pattren 
-fn search(filename: &str, pattren: &str) -> Result<String, String> {
+fn search(filename: &str, pattren: &str) -> Result<Vec<String>, String> {
     let text = match read_file(filename){
         Ok(t) => t,
         Err(v) => return Err(v.to_string())
     };
-    match is_found(&text, pattren) {
-        Ok(_) => Ok(filename.to_string()),
-        Err(_) => Err("Not found!".to_string()) 
+
+    let lines: Vec<&str> = text.split('\n').collect();
+    let mut result= Vec::new();
+    for (i, line) in lines.iter().enumerate() {
+        //println!("{}: {}", i, line);
+        if let Ok(_) = is_found(&line, pattren) {
+            result.push(format!("{} \n\t{}: {}", filename.to_string(), i, line).to_string()) 
+        }
+  
     }
+    Ok(result)
+
 
 }
-
 
 
 /// This function takes a text and a pattren and uses regular expression to
