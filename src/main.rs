@@ -12,11 +12,11 @@ fn main(){
                         .skip(1)
                         .collect::<Vec<String>>();
     if args.len() >= 2 {
-        let pattren = &args[0];
+        let pattern = &args[0];
         let filenames =  &args[1..];
              
         for filename in filenames{
-            match search(filename, pattren) {
+            match search(filename, pattern) {
                 Ok(result) => {
                     for r in result {
                         println!("{}\n", r);
@@ -56,10 +56,10 @@ fn search(filename: &str, pattren: &str) -> Result<Vec<String>, String> {
 }
 
 
-/// This function takes a text and a pattren and uses regular expression to
+/// This function takes a text and a pattern and uses regular expression to
 /// test if they match
-fn is_found(text: &str, pattren: &str) -> Result<bool, bool> {
-    let re = Regex::new(pattren).unwrap();
+fn is_found(text: &str, pattern: &str) -> Result<bool, bool> {
+    let re = Regex::new(pattern).unwrap();
     if re.is_match(text)  {
         Ok(true)
     } else {
