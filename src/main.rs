@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::env;
 use regex::Regex;
+use std::collections::HashMap;
 
 fn main(){
     let args =  env::args()
@@ -18,8 +19,11 @@ fn main(){
         for filename in filenames{
             match search(filename, pattern) {
                 Ok(result) => {
-                    for r in result {
-                        println!("{}\n", r);
+                    for (fname, lines) in result {
+			println!("\n{}: \n", fname);
+			for line in lines{
+				println!("{}\n", line );
+			}
                     }
                 },
                 Err(_) => {}
@@ -35,7 +39,7 @@ fn main(){
 
 /// This function takes a file name and pattren and returns the name
 /// of the file which contains the text that match the pattren 
-fn search(filename: &str, pattren: &str) -> Result<Vec<String>, String> {
+fn search(filename: &str, pattren: &str) -> Result<HashMap<String, Vec<String>>, String> {
     let text = match read_file(filename){
         Ok(t) => t,
         Err(v) => return Err(v.to_string())
@@ -43,14 +47,24 @@ fn search(filename: &str, pattren: &str) -> Result<Vec<String>, String> {
 
     let lines: Vec<&str> = text.split('\n').collect();
     let mut result= Vec::new();
+    let mut result_hash = HashMap::new();
+
     for (i, line) in lines.iter().enumerate() {
         //println!("{}: {}", i, line);
         if let Ok(_) = is_found(&line, pattren) {
-            result.push(format!("{} \n\t{}: {}", filename.to_string(), i, line).to_string()) 
+            result.push(format!("\t{}: {}", i, line).to_string());
+        	
         }
   
     }
-    Ok(result)
+    if result.len() >= 1 {
+    	if let None = result_hash.get(&filename.to_string()){
+        		
+        	result_hash.insert(filename.to_string(), result);
+ 		}
+    } 
+   
+    Ok(result_hash)
 
 
 }
