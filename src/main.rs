@@ -9,16 +9,16 @@ use std::collections::HashMap;
 
 fn main(){
     let args =  env::args()
-                        .into_iter()                 
+                        .into_iter()
                         .skip(1)
                         .collect::<Vec<String>>();
     if args.len() >= 2 {
         let pattern = &args[0];
         let filenames =  &args[1..];
-             
+
         for filename in filenames{
             match search(filename, pattern) {
-                Ok(result) => {
+                Some(result) => {
                     for (fname, lines) in result {
 			println!("\n{}: \n", fname);
 			for line in lines{
@@ -26,23 +26,21 @@ fn main(){
 			}
                     }
                 },
-                Err(_) => {}
+                None => {}
             }
-        }             
+        }
     } else {
         println!("Usage: refd pattren files...");
-    } 
-          
-    
+    }
 }
 
 
 /// This function takes a file name and pattren and returns the name
 /// of the file which contains the text that match the pattren 
-fn search(filename: &str, pattren: &str) -> Result<HashMap<String, Vec<String>>, String> {
+fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>> {
     let text = match read_file(filename){
         Ok(t) => t,
-        Err(v) => return Err(v.to_string())
+        Err(_) => return None
     };
 
     let lines: Vec<&str> = text.split('\n').collect();
@@ -51,20 +49,18 @@ fn search(filename: &str, pattren: &str) -> Result<HashMap<String, Vec<String>>,
 
     for (i, line) in lines.iter().enumerate() {
         //println!("{}: {}", i, line);
-        if let Ok(_) = is_found(&line, pattren) {
+        if let Some(_) = is_found(&line, pattren) {
             result.push(format!("\t{}: {}", i, line).to_string());
-        	
         }
-  
+
     }
     if result.len() >= 1 {
     	if let None = result_hash.get(&filename.to_string()){
-        		
         	result_hash.insert(filename.to_string(), result);
  		}
-    } 
-   
-    Ok(result_hash)
+    }
+
+    Some(result_hash)
 
 
 }
@@ -72,12 +68,12 @@ fn search(filename: &str, pattren: &str) -> Result<HashMap<String, Vec<String>>,
 
 /// This function takes a text and a pattern and uses regular expression to
 /// test if they match
-fn is_found(text: &str, pattern: &str) -> Result<bool, bool> {
+fn is_found(text: &str, pattern: &str) -> Option<bool> {
     let re = Regex::new(pattern).unwrap();
     if re.is_match(text)  {
-        Ok(true)
+        Some(true)
     } else {
-        Err(false)
+        None
     }
 }
 
@@ -96,9 +92,9 @@ fn read_file(path: &str) -> Result<String, &str>{
 
 #[test]
 fn test_is_found() {
-    assert_eq!(is_found("hi there", "hi"), Ok(true));
-    assert_eq!(is_found("hi there", "hello"), Err(false));
-    assert_eq!(is_found("Hi there", "[Hh]i"), Ok(true));
+    assert_eq!(is_found("hi there", "hi"), Some(true));
+    assert_eq!(is_found("hi there", "hello"), None);
+    assert_eq!(is_found("Hi there", "[Hh]i"), Some(true));
 }
 
 
