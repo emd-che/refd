@@ -7,6 +7,7 @@ use std::env;
 use regex::Regex;
 use std::collections::HashMap;
 
+
 fn main(){
     let args =  env::args()
                         .into_iter()
@@ -70,7 +71,8 @@ fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>>
 /// test if they match
 fn is_found(text: &str, pattern: &str) -> Option<bool> {
     let re = Regex::new(pattern).unwrap();
-    if re.is_match(text)  {
+    if let Some(result) = re.find(text)  {
+        println!("{:?}", &text[result.start()..result.end()]);
         Some(true)
     } else {
         None

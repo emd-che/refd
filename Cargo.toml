@@ -5,3 +5,4 @@ authors = ["baddin"]
 
 [dependencies]
 regex = "1.0.1"
+colored = "1.6"
