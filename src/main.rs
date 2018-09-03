@@ -58,7 +58,7 @@ fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>>
            
             let mut colored: Vec<String> = vec![];
             for word in words.iter() {
-                if word == &value {
+                if word.contains(&value) {
                     println!("value: {}", value);
                     colored.push(format!("{}", word.green()));
                     println!("word: {}", word);
