@@ -5,5 +5,5 @@ A grep like tool that list files names and the matched lines with their line num
 ## Usage
 
 `
-refd pattren files... 
+refd "pattren" files... 
 `
