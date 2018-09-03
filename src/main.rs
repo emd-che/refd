@@ -59,14 +59,14 @@ fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>>
             let mut colored: Vec<String> = vec![];
             for word in words.iter() {
                 if word.contains(&value) {
-                    println!("value: {}", value);
+                    //println!("value: {}", value);
                     colored.push(format!("{}", word.green()));
-                    println!("word: {}", word);
-                    println!("colored: {:?}", colored);
+                    //println!("word: {}", word);
+                    //println!("colored: {:?}", colored);
                 } else {
                     colored.push(word.to_string());
-                    println!("else word: {}", word);
-                    println!("else colored: {:?}", colored);
+                    //println!("else word: {}", word);
+                    //println!("else colored: {:?}", colored);
                 }
             }
             result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
