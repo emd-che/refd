@@ -112,9 +112,9 @@ fn read_file(path: &str) -> Result<String, &str>{
 
 #[test]
 fn test_is_found() {
-    assert_eq!(is_found("hi there", "hi"), Some(true));
+    assert_eq!(is_found("hi there", "hi"), Some("hi".to_string()));
     assert_eq!(is_found("hi there", "hello"), None);
-    assert_eq!(is_found("Hi there", "[Hh]i"), Some(true));
+    assert_eq!(is_found("Hi there", "[Hh]i"), Some("Hi".to_string()));
 }
 
 
