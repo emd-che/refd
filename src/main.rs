@@ -52,8 +52,24 @@ fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>>
 
     for (i, line) in lines.iter().enumerate() {
         //println!("{}: {}", i, line);
-        if let Some(_) = is_found(&line, pattren) {
-            result.push(format!("\t{}: {}", i, line).to_string());
+        if let Some(value) = is_found(&line, pattren) {
+            let words: Vec<&str> = line.split(" ").collect();
+            //println!("word: {:?}", words);
+           
+            let mut colored: Vec<String> = vec![];
+            for word in words.iter() {
+                if word == &value {
+                    println!("value: {}", value);
+                    colored.push(format!("{}", word.green()));
+                    println!("word: {}", word);
+                    println!("colored: {:?}", colored);
+                } else {
+                    colored.push(word.to_string());
+                    println!("else word: {}", word);
+                    println!("else colored: {:?}", colored);
+                }
+            }
+            result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
         }
 
     }
@@ -71,11 +87,11 @@ fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>>
 
 /// This function takes a text and a pattern and uses regular expression to
 /// test if they match
-fn is_found(text: &str, pattern: &str) -> Option<bool> {
+fn is_found(text: &str, pattern: &str) -> Option<String> {
     let re = Regex::new(pattern).unwrap();
     if let Some(result) = re.find(text)  {
-        println!("{}", &text[result.start()..result.end()].green());
-        Some(true)
+        println!("{}", &text[result.start()..result.end()].green()); 
+        Some( text[result.start()..result.end()].to_string())
     } else {
         None
     }
