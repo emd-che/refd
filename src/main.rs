@@ -1,6 +1,8 @@
 
 extern crate regex;
+extern crate colored;
 
+use colored::*;
 use std::fs::File;
 use std::io::prelude::*;
 use std::env;
@@ -72,7 +74,7 @@ fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>>
 fn is_found(text: &str, pattern: &str) -> Option<bool> {
     let re = Regex::new(pattern).unwrap();
     if let Some(result) = re.find(text)  {
-        println!("{:?}", &text[result.start()..result.end()]);
+        println!("{}", &text[result.start()..result.end()].green());
         Some(true)
     } else {
         None
