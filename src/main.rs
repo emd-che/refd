@@ -29,7 +29,7 @@ fn main(){
 			}
                     }
                 },
-                None => {}
+                None => {println!("Error reading file");}
             }
         }
     } else {
