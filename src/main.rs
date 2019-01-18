@@ -10,6 +10,63 @@ use regex::Regex;
 use std::collections::HashMap;
 
 
+
+
+//new changes
+//---------------------------------------------------------------------
+#[derive(Debug)]
+struct Search {
+    filename: &'static str,
+    pattren: &'static str
+}
+impl Search {
+    fn new(&self, filename: &'static str, pattren: &'static str) -> Self{
+        Search{
+            filename: filename,
+            pattren: pattren
+        }
+    }
+
+    fn search(&self) -> Option<Vec<String>>{
+        let text = match read_file(&self.filename){
+            Ok(t) => t,
+            Err(why) => panic!(why)
+        };
+
+
+        let lines: Vec<&str> = text.split('\n').collect();
+        let mut result: Vec<String>= Vec::new();
+        for (i, line) in lines.iter().enumerate() {
+                //println!("{}: {}", i, line);
+            if let Some(value) = is_found(&line, &self.pattren) {
+                let words: Vec<&str> = line.split(" ").collect();
+                //println!("word: {:?}", words);
+                   
+                let mut colored: Vec<String> = vec![];
+                for word in words.iter() {
+                    if word.contains(&value) {
+                            //println!("value: {}", value);
+                        colored.push(format!("{}", word.green()));
+                            //println!("word: {}", word);
+                            //println!("colored: {:?}", colored);
+                    } else {
+                        colored.push(word.to_string());
+                            //println!("else word: {}", word);
+                            //println!("else colored: {:?}", colored);
+                    }
+                
+                }
+                result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
+            }
+
+        }
+        Some(result)
+    }
+}
+
+//------------------------------------------------------------------------
+
+
 fn main(){
     let args =  env::args()
                         .into_iter()
