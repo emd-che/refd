@@ -27,18 +27,24 @@ impl Search {
         }
     }
 
+    /// This method takes a file name and a pattren and returns a list
+    /// of the lines that contain the matched words 
     fn search(&self) -> Option<Vec<String>>{
+
         let text = match read_file(self.filename.to_string()){
             Ok(t) => t,
             Err(why) => panic!(why)
         };
 
         let lines: Vec<&str> = text.split('\n').collect();
+
         let mut result: Vec<String>= Vec::new();
+        /*Searching for matches*/
         for (i, line) in lines.iter().enumerate() {
             if let Some(value) = match_found(&line, &self.pattren) {
                 let words: Vec<&str> = line.split(" ").collect(); 
                 let mut colored: Vec<String> = vec![];
+                /*Coloring the matched words*/
                 for word in words.iter() {
                     if word.contains(&value) {
                         colored.push(format!("{}{}", word[0..value.len()].red(), &word[value.len()..]));
@@ -46,6 +52,7 @@ impl Search {
                         colored.push(word.to_string());
                     }
                 }
+                /*Adding the matched lines with the colored words to the "result" Vec*/
                 result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
             }
         }
@@ -103,78 +110,11 @@ fn main(){
 
         handle.join().unwrap()
 
-      
-       
-
-
-
-        /*
-        for filename in filenames{
-            match search(filename, pattern) {
-                Some(result) => {
-                    for (fname, lines) in result {
-			println!("\n{}: \n", fname);
-			for line in lines{
-				println!("{}\n", line );
-			}
-                    }
-                },
-                None => {println!("Error reading file");}
-            }
-        }
-    } else {
-        println!("Usage: refd pattren files...");
-    */
     }
     
 }
 
 
-/// This function takes a file name and pattren and returns the name
-/// of the file which contains the text that match the pattren 
-// fn search(filename: &str, pattren: &str) -> Option<HashMap<String, Vec<String>>> {
-//     let text = match read_file(filename.to_string()){
-//         Ok(t) => t,
-//         Err(_) => return None
-//     };
-
-//     let lines: Vec<&str> = text.split('\n').collect();
-//     let mut result= Vec::new();
-//     let mut result_hash = HashMap::new();
-
-//     for (i, line) in lines.iter().enumerate() {
-//         //println!("{}: {}", i, line);
-//         if let Some(value) = match_found(&line, pattren) {
-//             let words: Vec<&str> = line.split(" ").collect();
-//             //println!("word: {:?}", words);
-           
-//             let mut colored: Vec<String> = vec![];
-//             for word in words.iter() {
-//                 if word.contains(&value) {
-//                     //println!("value: {}", value);
-//                     colored.push(format!("{}", word.green()));
-//                     //println!("word: {}", word);
-//                     //println!("colored: {:?}", colored);
-//                 } else {
-//                     colored.push(word.to_string());
-//                     //println!("else word: {}", word);
-//                     //println!("else colored: {:?}", colored);
-//                 }
-//             }
-//             result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
-//         }
-
-//     }
-//     if result.len() >= 1 {
-//     	if let None = result_hash.get(&filename.to_string()){
-//         	result_hash.insert(filename.to_string(), result);
-//  		}
-//     }
-
-//     Some(result_hash)
-
-
-// }
 
 
 /// This function takes a text and a pattern and uses regular expression to
@@ -190,17 +130,6 @@ fn match_found(text: &str, pattern: &str) -> Option<String> {
 }
 
 
-/// This function reads a file and return it's content
-// fn read_file(path: &str) -> Result<String, &str>{
-//     let mut file = match File::open(path) {
-//         Ok(f) => f, 
-//         Err(_) => return Err("Error reading file")
-//     };
-
-//     let mut content = String::new();
-//     let _c = file.read_to_string(&mut content);
-//     Ok(content)
-// }
 
 #[test]
 fn test_is_found() {
