@@ -8,7 +8,7 @@ use std::io::prelude::*;
 use std::env;
 use regex::Regex;
 //use std::collections::HashMap;
-
+use std::thread;
 
 
 
@@ -41,7 +41,7 @@ impl Search {
                 let mut colored: Vec<String> = vec![];
                 for word in words.iter() {
                     if word.contains(&value) {
-                        colored.push(format!("{}", word.green()));
+                        colored.push(format!("{}{}", word[0..value.len()].red(), &word[value.len()..]));
                     } else {
                         colored.push(word.to_string());
                     }
@@ -77,18 +77,36 @@ fn main(){
 
     if args.len() >= 2 {
         let pattern = &args[0];
-        //let filenames =  &args[1..];
-        let filename = &args[1];
-        let s = Search::new(filename.to_string(), pattern.to_string()); 
+        let filenames =  &args[1..];
+        //let filename = &args[1];
+        //let s = Search::new(filename.to_string(), pattern.to_string()); 
 
-        let result = match s.search() {
-            Some(v) => v,
-            None => vec!()
-        };
-        println!("{}", s.filename);
-        for m in result.iter() {
-            println!("{}", m);
+        let mut searches: Vec<Search> = Vec::new();
+        for fname in filenames{
+            searches.push(Search::new(fname.to_string(), pattern.to_string()));
         }
+
+        let handle = thread::spawn(move || {
+            for s in searches.into_iter() {
+                let result = match s.search() {
+                    Some(v) => v,
+                    None => vec!()
+                };
+                println!("{}", s.filename.green());
+                for m in result.iter() {
+                    println!("{}", m);
+                }
+                println!("");
+            }
+        });
+
+
+        handle.join().unwrap()
+
+      
+       
+
+
 
         /*
         for filename in filenames{
@@ -164,7 +182,7 @@ fn main(){
 fn match_found(text: &str, pattern: &str) -> Option<String> {
     let re = Regex::new(pattern).unwrap();
     if let Some(result) = re.find(text)  {
-        println!("{}", &text[result.start()..result.end()].green()); 
+        //println!("{}", &text[result.start()..result.end()].green()); 
         Some( text[result.start()..result.end()].to_string())
     } else {
         None
