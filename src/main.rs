@@ -7,13 +7,10 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::env;
 use regex::Regex;
-//use std::collections::HashMap;
 use std::thread;
 
 
 
-//new changes
-//---------------------------------------------------------------------
 #[derive(Debug)]
 struct Search {
     filename: String,
@@ -56,23 +53,39 @@ impl Search {
                 result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
             }
         }
-        Some(result)
+        if result.len() > 0 {
+            Some(result)
+        } else {
+            None
+        }
+        
     }
 }
 
 
 /// This function reads a file and return it's content
-fn read_file(path: String) -> Result<String, &'static str>{
+fn read_file(path: String) -> Result<String, std::io::Error>{
     let mut file = match File::open(&path) {
         Ok(f) => f, 
-        Err(_) => return Err("Error reading file")
+        Err(why) => return Err(why)
     };
 
     let mut content = String::new();
     let _c = file.read_to_string(&mut content);
     Ok(content)
 }
-//------------------------------------------------------------------------
+
+
+/// This function takes a text and a pattern and uses regular expression to
+/// test if they match
+fn match_found(text: &str, pattern: &str) -> Option<String> {
+    let re = Regex::new(pattern).unwrap();
+    if let Some(result) = re.find(text)  { 
+        Some( text[result.start()..result.end()].to_string())
+    } else {
+        None
+    }
+}
 
 
 fn main(){
@@ -85,8 +98,6 @@ fn main(){
     if args.len() >= 2 {
         let pattern = &args[0];
         let filenames =  &args[1..];
-        //let filename = &args[1];
-        //let s = Search::new(filename.to_string(), pattern.to_string()); 
 
         let mut searches: Vec<Search> = Vec::new();
         for fname in filenames{
@@ -108,7 +119,7 @@ fn main(){
         });
 
 
-        handle.join().unwrap()
+        handle.join().unwrap();
 
     }
     
@@ -117,17 +128,6 @@ fn main(){
 
 
 
-/// This function takes a text and a pattern and uses regular expression to
-/// test if they match
-fn match_found(text: &str, pattern: &str) -> Option<String> {
-    let re = Regex::new(pattern).unwrap();
-    if let Some(result) = re.find(text)  {
-        //println!("{}", &text[result.start()..result.end()].green()); 
-        Some( text[result.start()..result.end()].to_string())
-    } else {
-        None
-    }
-}
 
 
 
