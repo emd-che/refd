@@ -4,6 +4,7 @@ extern crate colored;
 
 use colored::*;
 use std::fs::File;
+use std::fs;
 use std::io::prelude::*;
 use std::env;
 use regex::Regex;
@@ -103,9 +104,10 @@ fn main(){
         for fname in filenames{
             searches.push(Search::new(fname.to_string(), pattern.to_string()));
         }
-
-        let handle = thread::spawn(move || {
-            for s in searches.into_iter() {
+        let mut handles = vec![];
+        for s in searches.into_iter() {
+            
+            handles.push(thread::spawn(move || {
                 let result = match s.search() {
                     Some(v) => v,
                     None => vec!()
@@ -115,11 +117,13 @@ fn main(){
                     println!("{}", m);
                 }
                 println!("");
-            }
-        });
-
-
-        handle.join().unwrap();
+                
+            }));
+        }
+        for handle in handles.into_iter(){
+            handle.join().unwrap();
+        }
+        
 
     }
     
@@ -127,16 +131,29 @@ fn main(){
 
 
 
+#[cfg(test)]
+mod tests {
+	use super::*;
 
+	#[test]
+	fn test_search(){
+		fs::write("test", "something" ).expect("Could not write to the config file.");
+		let s = Search::new("Something".to_string(), "test".to_string());
+		let expected = Some(vec!("Something".to_string()));
+		assert_eq!(expected, s.search());
+	}
 
+	#[test]
+	fn test_is_found() {
+	    assert_eq!(match_found("hi there", "hi"), Some("hi".to_string()));
+	    assert_eq!(match_found("hi there", "hello"), None);
+	    assert_eq!(match_found("Hi there", "[Hh]i"), Some("Hi".to_string()));
+	}
 
-
-#[test]
-fn test_is_found() {
-    assert_eq!(match_found("hi there", "hi"), Some("hi".to_string()));
-    assert_eq!(match_found("hi there", "hello"), None);
-    assert_eq!(match_found("Hi there", "[Hh]i"), Some("Hi".to_string()));
 }
+
+
+
 
 
 
