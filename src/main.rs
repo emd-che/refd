@@ -41,15 +41,16 @@ impl Search {
         for (i, line) in lines.iter().enumerate() {
             if let Some(value) = match_found(&line, &self.pattren) {
                 let words: Vec<&str> = line.split(" ").collect(); 
-                let mut colored: Vec<String> = vec![];
+                let mut colored: Vec<String> = color_word(words, value);
+                
                 /*Coloring the matched words*/
-                for word in words.iter() {
-                    if word.contains(&value) {
-                        colored.push(format!("{}{}", word[0..value.len()].red(), &word[value.len()..]));
-                    } else {
-                        colored.push(word.to_string());
-                    }
-                }
+                // for word in words.iter() {
+                //     if word.contains(&value) {
+                //         colored.push(format!("{}{}", word[0..value.len()].red(), &word[value.len()..]));
+                //     } else {
+                //         colored.push(word.to_string());
+                //     }
+                // }
                 /*Adding the matched lines with the colored words to the "result" Vec*/
                 result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
             }
@@ -63,6 +64,22 @@ impl Search {
     }
 }
 
+
+fn color_word(words: Vec<&str>, keyword: String) -> Vec<String>{
+
+    let mut colored: Vec<String> = vec![];
+
+    for word in words.iter() {
+        if word.contains(&keyword) {
+            colored.push(format!("{}{}", word[0..keyword.len()].red(), &word[keyword.len()..]));
+        } else {
+            colored.push(word.to_string());
+        }
+    }
+
+  colored
+
+}
 
 /// This function reads a file and return it's content
 fn read_file(path: String) -> Result<String, std::io::Error>{
