@@ -4,11 +4,12 @@ extern crate colored;
 
 use colored::*;
 use std::fs::File;
-use std::fs;
+
 use std::io::prelude::*;
 use std::env;
 use regex::Regex;
 use std::thread;
+
 
 
 
@@ -31,26 +32,19 @@ impl Search {
 
         let text = match read_file(self.filename.to_string()){
             Ok(t) => t,
-            Err(why) => panic!(why)
+            Err(why) => panic!(why),
         };
-
         let lines: Vec<&str> = text.split('\n').collect();
 
         let mut result: Vec<String>= Vec::new();
         /*Searching for matches*/
         for (i, line) in lines.iter().enumerate() {
             if let Some(value) = match_found(&line, &self.pattren) {
-                let words: Vec<&str> = line.split(" ").collect(); 
+                let words: Vec<&str> = line.split(" ").collect();
+
+                  /*Coloring the matched words*/
                 let mut colored: Vec<String> = color_word(words, value);
-                
-                /*Coloring the matched words*/
-                // for word in words.iter() {
-                //     if word.contains(&value) {
-                //         colored.push(format!("{}{}", word[0..value.len()].red(), &word[value.len()..]));
-                //     } else {
-                //         colored.push(word.to_string());
-                //     }
-                // }
+                dbg!(&colored);
                 /*Adding the matched lines with the colored words to the "result" Vec*/
                 result.push(format!("\t{}: {}", i, colored.join(" ")).to_string());
             }
@@ -65,6 +59,7 @@ impl Search {
 }
 
 
+// Coloring the matched values 
 fn color_word(words: Vec<&str>, keyword: String) -> Vec<String>{
 
     let mut colored: Vec<String> = vec![];
@@ -85,7 +80,7 @@ fn color_word(words: Vec<&str>, keyword: String) -> Vec<String>{
 fn read_file(path: String) -> Result<String, std::io::Error>{
     let mut file = match File::open(&path) {
         Ok(f) => f, 
-        Err(why) => return Err(why)
+        Err(why) => return Err(why),
     };
 
     let mut content = String::new();
@@ -107,6 +102,7 @@ fn match_found(text: &str, pattern: &str) -> Option<String> {
 
 
 fn main(){
+
     let args =  env::args()
                         .into_iter()
                         .skip(1)
@@ -137,27 +133,64 @@ fn main(){
                 
             }));
         }
+       
         for handle in handles.into_iter(){
             handle.join().unwrap();
         }
         
 
     }
-    
+
+
 }
-
-
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+    use std::error::Error;
 	use super::*;
 
 	#[test]
 	fn test_search(){
-		fs::write("test", "something" ).expect("Could not write to the config file.");
-		let s = Search::new("Something".to_string(), "test".to_string());
-		let expected = Some(vec!("Something".to_string()));
-		assert_eq!(expected, s.search());
+
+        //create temporarly file for testing 
+        let path = Path::new("test");
+        let display = path.display();
+
+        let mut file = match File::create(&path){
+            Err(why) => panic!("unable to create {}: {}", display, why.description()),
+            Ok(file) => file,
+        };
+
+        match file.write_all("functfunion\nfun\nfun fdfdf".as_bytes()){
+            Err(why) => panic!("unable to write to {}: {}", display, why.description()),
+            Ok(_) => println!("successfully wrote to {}", display),
+        }
+        
+
+		let s = Search::new("test".to_string(), "fun".to_string());
+
+     
+
+        println!("{:?}", s.search());
+        dbg!(s.search());
+    
+        let result = s.search();
+
+        //delete the file
+        match std::fs::remove_file(&path) {
+            Err(why) => panic!("unable to delete {}: {}", display, why.description()),
+            Ok(_) => println!("successfully deleted {}", display),
+        }
+
+	    let expected = Some(vec!(
+        "\t0: \u{1b}[31mfun\u{1b}[0mctfunion".to_string(),
+        "\t1: \u{1b}[31mfun\u{1b}[0m".to_string(),
+        "\t2: \u{1b}[31mfun\u{1b}[0m fdfdf".to_string(),));
+
+		assert_eq!(expected, result);
+
+     
 	}
 
 	#[test]
